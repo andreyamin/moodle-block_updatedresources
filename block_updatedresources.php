@@ -19,7 +19,7 @@ class block_updatedresources extends block_list {
 	    $this->content         =  new stdClass;
 	    $this->content->items  =  array();
 	    $this->content->icons  =  array();
-	    $this->content->footer =  '';
+	    $this->content->footer =  html_writer::link(new moodle_url('/blocks/updatedresources/view.php'),'Busca avançada');
 
 	    if (isloggedin() and !isguestuser()) {
 	    	if ($courses = enrol_get_my_courses()) {
@@ -38,35 +38,37 @@ class block_updatedresources extends block_list {
 					on  m.id = cm.module
 					join (
 					SELECT \'3\' AS moduleid, id, course, name, timemodified
-					from mdl_book
+					from mdl_book b
 					UNION all
 					SELECT \'8\' AS moduleid, id, course, name,  timemodified
-					from mdl_folder
+					from mdl_folder f
 					union all
 					SELECT \'11\' AS moduleid, id, course, name, timemodified
-					from mdl_imscp
+					from mdl_imscp i 
 					Union all
 					SELECT \'15\' AS moduleid, id, course, name,  timemodified
-					from mdl_page
+					from mdl_page p
 					union all
 					SELECT \'17\' AS moduleid, id, course, name, timemodified
-					from mdl_resource
+					from mdl_resource r
 					union all
 					SELECT \'18\' AS moduleid, id, course, name, timemodified
-					from mdl_scorm
+					from mdl_scorm s
 					union all
 					SELECT \'20\' AS moduleid, id, course, name, timemodified
-					from mdl_url
+					from mdl_url u
 					) inst
 					on inst.moduleid = cm.module
 					and inst.id = cm.instance
 					where cm.visible = \'1\'
-					and cm.course in (?)
-					and inst.timemodified > ?
+					and cm.course in (' . $cids . ')
+					and inst.timemodified > ' . $lookback . '
 					order by inst.timemodified desc
-					limit 10';
+					limit 20';
 
-                $resources = $DB->get_records_sql($sql, array($cids, $lookback));
+		
+
+                $resources = $DB->get_records_sql($sql);
 
                 foreach ($resources as $resource) {
                   		$this->content->items[] = html_writer::link($CFG->wwwroot . '/mod/' . $resource->module . '/view.php?id='. $resource->id, $resource->name);
