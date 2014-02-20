@@ -19,7 +19,7 @@ class block_updatedresources extends block_list {
 	    $this->content         =  new stdClass;
 	    $this->content->items  =  array();
 	    $this->content->icons  =  array();
-	    $this->content->footer =  html_writer::link(new moodle_url('/blocks/updatedresources/view.php'),'Busca avançada');
+	    $this->content->footer =  '';
 
 	    if (isloggedin() and !isguestuser()) {
 	    	if ($courses = enrol_get_my_courses()) {
@@ -66,7 +66,6 @@ class block_updatedresources extends block_list {
 					order by inst.timemodified desc
 					limit 20';
 
-		
 
                 $resources = $DB->get_records_sql($sql);
 
@@ -74,10 +73,14 @@ class block_updatedresources extends block_list {
                   		$this->content->items[] = html_writer::link($CFG->wwwroot . '/mod/' . $resource->module . '/view.php?id='. $resource->id, $resource->name);
                    		$this->content->icons[] = '<img src="'.$OUTPUT->pix_url('icon',$resource->module) . '" class="iconsmall" alt="" />';
                 }
+                $this->content->footer =  html_writer::link(new moodle_url('/blocks/updatedresources/view.php'),'Busca avançada');
             }
-	    }
 
 		return $this->content;
+
+	    }
+
+
   	
   	}
 }

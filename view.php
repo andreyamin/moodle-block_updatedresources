@@ -1,16 +1,25 @@
 <?php
 
 require_once('../../config.php');
+require_once('updatedresources_form.php');
 
 global $DB, $OUTPUT, $PAGE;
 
+$PAGE->set_context(context_system::instance());
 $PAGE->set_url('/blocks/updatedresources/view.php');
 $PAGE->set_pagelayout('standard');
 $PAGE->set_heading('Busca Avançada');
 
-require_login();
+//Form defalults
+$param = new stdClass();
+$param->perpage = '10';
+$param->startdate = time()-7*24*60*60;
+
+$searchform = new updatedresources_form();
+
 
 echo $OUTPUT->header();
+$searchform->display();
 
 if (isloggedin() and !isguestuser()) {
 	if ($courses = enrol_get_my_courses()) {
