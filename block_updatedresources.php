@@ -8,6 +8,10 @@ class block_updatedresources extends block_list {
     public function instance_allow_multiple() {
   		return false;
 	}
+
+	function has_config() {
+		return true;
+	}
     
     public function get_content() {
         global $CFG, $USER, $DB, $OUTPUT;

@@ -1,7 +1,7 @@
 <?php
 
 require_once('../../config.php');
-require_once('updatedresources_form.php');
+//require_once('updatedresources_form.php');
 
 global $DB, $OUTPUT, $PAGE;
 
@@ -10,27 +10,76 @@ $PAGE->set_url('/blocks/updatedresources/view.php');
 $PAGE->set_pagelayout('standard');
 $PAGE->set_heading('Busca Avançada');
 
-//Form defalults
-$param = new stdClass();
-$param->perpage = '10';
-$param->startdate = time()-7*24*60*60;
 
-$searchform = new updatedresources_form();
+$lookback = optional_param('lookback','0', PARAM_INT);
+$cid      = optional_param('cid','0', PARAM_INT);
+$page     = optional_param('page', 0, PARAM_INT);
+$perpage  = optional_param('perpage', 10, PARAM_INT);
+
+if (empty($lookback)) {
+	$lookback = time() - 7*24*60*60;
+}
+
+if (empty($cid)) {
+	$cid = '0';
+}
 
 
 echo $OUTPUT->header();
-$searchform->display();
+//$searchform->display();
+
+echo "<form class=\"logselectform\" action=\"$CFG->wwwroot/blocks/updatedresources/view.php\" method=\"get\">\n";
+echo "<div>\n";
+
+$strftimedate = get_string("strftimedate");
+$strftimedaydate = get_string("strftimedaydate");
+
+$timenow = time(); // GMT
+
+// What day is it now for the user, and when is midnight that day (in GMT).
+$timemidnight = $today = usergetmidnight($timenow);
+
+// Put today up the top of the list
+$dates = array("$timemidnight" => get_string("today").", ".userdate($timenow, $strftimedate) );
+
+
+$numdates = 1;
+while ($numdates < 31) {
+    $timemidnight = $timemidnight - 86400;
+    $timenow = $timenow - 86400;
+    $dates["$timemidnight"] = userdate($timenow, $strftimedaydate);
+    $numdates++;
+}
+//var_dump($dates);
+$courses = enrol_get_my_courses();
+foreach ($courses as $course) {
+	$courselist[$course->id] = $course->fullname;
+}
+
+echo html_writer::label('Cursos', 'courses');
+echo html_writer::select($courselist, "cid", $cid, 'Todos os cursos');
+
+echo html_writer::label('Mostrar atualizações desde', 'lookback');
+echo html_writer::select($dates, "lookback", "$lookback", 'Últimos 7 dias');
+
+echo '<input type="submit" value="Buscar" />';
+echo '</div>';
+echo '</form>';
 
 if (isloggedin() and !isguestuser()) {
-	if ($courses = enrol_get_my_courses()) {
-		$cs = array();
-        foreach ($courses as $course) {
-        	$cs[]= $course->id;
-        }
-        $cids = '';
-        $cids = join(',',$cs);
-
-       	$lookback = time() - 7*24*60*60;
+	if ($courses) {
+		if ($cid == 0) {
+			$cs = array();
+			foreach ($courses as $course) {
+	        	$cs[]= $course->id;
+	        }
+	        $cids = '';
+	        $cids = join(',',$cs);
+	    } else {
+	    	$cids = $cid;
+	    }
+	    $where = 'and cm.course in (' . $cids . ') ';
+	    $where .= ' and inst.timemodified > ' . $lookback;
 
        	$sql = 'Select cm.id, inst.moduleid, inst.name, cm.course, cm.visible, inst.timemodified, c.shortname, m.name as module
 			From mdl_course_modules cm
@@ -64,13 +113,23 @@ if (isloggedin() and !isguestuser()) {
 			and inst.id = cm.instance
 			where cm.visible = \'1\'
 			and cm.course in (' . $cids . ')
-			and inst.timemodified > ' . $lookback . '
-			order by inst.timemodified desc
-			limit 20';
-
+			and inst.timemodified > ' . $lookback . 
+			' order by inst.timemodified desc';
 		
-
         $resources = $DB->get_records_sql($sql);
+
+        $numres = count($resources);
+        $baseurl = new moodle_url('/blocks/updatedresources/view.php', 
+        	array(
+        		'cid'=>$cid,
+        		'lookback'=>$lookback,
+        		'page'=>$page, 
+        		'perpage'=>$perpage,
+        		'sort' => 0, 
+        		'dir' => 0
+        	));
+
+        echo $OUTPUT->paging_bar($numres, $page, $perpage, $baseurl);
 
         if ($resources){
         	$table = new html_table();
@@ -85,9 +144,7 @@ if (isloggedin() and !isguestuser()) {
         		$resourceurl = new moodle_url($CFG->wwwroot . '/mod/' . $resource->module . '/view.php?id='. $resource->id);
         		$resourcecourse = $resource->shortname;
         		$resourcecourseurl = new moodle_url($CFG->wwwroot . '/course/view.php', array('id'=>$resource->course));
-        		$timemodified = usergetdate($resource->timemodified);
-        		//var_dump($timemodified);
-        		$date = $timemodified['mday'] . '/' . $timemodified['mon'] . '/' . $timemodified['year']. ' ' . $timemodified['hours'] . ':' . $timemodified['minutes'] ;
+        		$date = userdate($resource->timemodified);
         		$table->data[] = array(html_writer::link($resourceurl,$resourcename), html_writer::link($resourcecourseurl,$resourcecourse), $date);
         	}
         	echo html_writer::table($table);
