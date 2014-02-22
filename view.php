@@ -8,7 +8,7 @@ global $DB, $OUTPUT, $PAGE;
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url('/blocks/updatedresources/view.php');
 $PAGE->set_pagelayout('standard');
-$PAGE->set_heading('Busca Avançada');
+$PAGE->set_heading(get_string('advancedsearch', 'block_updatedresources'));
 
 
 $lookback = optional_param('lookback','0', PARAM_INT);
@@ -50,17 +50,17 @@ while ($numdates < 31) {
     $dates["$timemidnight"] = userdate($timenow, $strftimedaydate);
     $numdates++;
 }
-//var_dump($dates);
+
 $courses = enrol_get_my_courses();
 foreach ($courses as $course) {
 	$courselist[$course->id] = $course->fullname;
 }
 
-echo html_writer::label('Cursos', 'courses');
-echo html_writer::select($courselist, "cid", $cid, 'Todos os cursos');
+echo html_writer::label(get_string('courses', 'block_updatedresources'), 'courses');
+echo html_writer::select($courselist, "cid", $cid, get_string('allcourses', 'block_updatedresources'));
 
-echo html_writer::label('Mostrar atualizações desde', 'lookback');
-echo html_writer::select($dates, "lookback", "$lookback", 'Últimos 7 dias');
+echo html_writer::label(get_string('showupdatessince', 'block_updatedresources'), 'lookback');
+echo html_writer::select($dates, "lookback", "$lookback", get_string('lastsevendays', 'block_updatedresources'));
 
 echo '<input type="submit" value="Buscar" />';
 echo '</div>';
@@ -133,7 +133,11 @@ if (isloggedin() and !isguestuser()) {
 
         if ($resources){
         	$table = new html_table();
-        	$table->head = array('Recurso','Curso', 'Data de atualização');
+        	$table->head = array(
+        		get_string('resource', 'block_updatedresources'),
+        		get_string('course', 'block_updatedresources'),
+        		get_string('lastupdate', 'block_updatedresources')
+        	);
         	$table->data = array();
         	$countresources = count($resources);
 

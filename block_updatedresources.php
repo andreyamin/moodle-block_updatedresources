@@ -1,8 +1,19 @@
 <?php
 class block_updatedresources extends block_list {
     
+	public function specialization() {
+		if (!empty($this->config->title)) {
+			$this->title = $this->config->title;
+		} else {
+	    	$this->config->title = get_string('updatedresources', 'block_updatedresources');
+	    }
+	 
+		if (empty($this->config->text)) {
+	    	$this->config->text = get_string('updatedresources', 'block_updatedresources');
+		}    
+	}
 	public function init() {
-        $this->title = get_string('updatedresources', 'block_updatedresources');
+		
     }
 
     public function instance_allow_multiple() {
@@ -35,6 +46,7 @@ class block_updatedresources extends block_list {
                 $cids = join(',',$cs);
 
             	$lookback = time() - 7*24*60*60;
+            	$listsize = $this->config->listsize;
 
             	$sql = 'Select cm.id, inst.moduleid, inst.name, cm.course, cm.visible, inst.timemodified, m.name as module
 					From mdl_course_modules cm
@@ -68,7 +80,7 @@ class block_updatedresources extends block_list {
 					and cm.course in (' . $cids . ')
 					and inst.timemodified > ' . $lookback . '
 					order by inst.timemodified desc
-					limit 20';
+					limit ' . $listsize;
 
 
                 $resources = $DB->get_records_sql($sql);
@@ -77,7 +89,7 @@ class block_updatedresources extends block_list {
                   		$this->content->items[] = html_writer::link($CFG->wwwroot . '/mod/' . $resource->module . '/view.php?id='. $resource->id, $resource->name);
                    		$this->content->icons[] = '<img src="'.$OUTPUT->pix_url('icon',$resource->module) . '" class="iconsmall" alt="" />';
                 }
-                $this->content->footer =  html_writer::link(new moodle_url('/blocks/updatedresources/view.php'),'Busca avançada');
+                $this->content->footer =  html_writer::link(new moodle_url('/blocks/updatedresources/view.php'),get_string('advancedsearch', 'block_updatedresources'));
             }
 
 		return $this->content;
