@@ -13,4 +13,3 @@ $string['lastsevendays'] = 'Last 7 days ';
 $string['resource'] = 'Resource';
 $string['course'] = 'Course';
 $string['lastupdate'] = 'Last update';
-

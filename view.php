@@ -114,22 +114,10 @@ if (isloggedin() and !isguestuser()) {
 			where cm.visible = \'1\'
 			and cm.course in (' . $cids . ')
 			and inst.timemodified > ' . $lookback . 
-			' order by inst.timemodified desc';
+			' order by inst.timemodified desc
+			limit 100';
 		
         $resources = $DB->get_records_sql($sql);
-
-        $numres = count($resources);
-        $baseurl = new moodle_url('/blocks/updatedresources/view.php', 
-        	array(
-        		'cid'=>$cid,
-        		'lookback'=>$lookback,
-        		'page'=>$page, 
-        		'perpage'=>$perpage,
-        		'sort' => 0, 
-        		'dir' => 0
-        	));
-
-        echo $OUTPUT->paging_bar($numres, $page, $perpage, $baseurl);
 
         if ($resources){
         	$table = new html_table();

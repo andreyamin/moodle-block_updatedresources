@@ -1,27 +1,22 @@
 <?php
 class block_updatedresources extends block_list {
     
+    public function init() {
+		$this->title = get_string('updatedresources', 'block_updatedresources');
+    }
+
+    function has_config() {
+		return true;
+	}
+
 	public function specialization() {
 		if (!empty($this->config->title)) {
 			$this->title = $this->config->title;
-		} else {
-	    	$this->config->title = get_string('updatedresources', 'block_updatedresources');
-	    }
-	 
-		if (empty($this->config->text)) {
-	    	$this->config->text = get_string('updatedresources', 'block_updatedresources');
-		}    
+		}  
 	}
-	public function init() {
-		
-    }
 
     public function instance_allow_multiple() {
   		return false;
-	}
-
-	function has_config() {
-		return true;
 	}
     
     public function get_content() {
@@ -30,7 +25,6 @@ class block_updatedresources extends block_list {
     	if ($this->content !== null) {
       		return $this->content;
     	}
- 
 	    $this->content         =  new stdClass;
 	    $this->content->items  =  array();
 	    $this->content->icons  =  array();
@@ -47,6 +41,11 @@ class block_updatedresources extends block_list {
 
             	$lookback = time() - 7*24*60*60;
             	$listsize = $this->config->listsize;
+            	if (empty($listsize)){
+            		$listsize = '10';
+            		$this->config->listsize = '10';
+            	}
+            	
 
             	$sql = 'Select cm.id, inst.moduleid, inst.name, cm.course, cm.visible, inst.timemodified, m.name as module
 					From mdl_course_modules cm
