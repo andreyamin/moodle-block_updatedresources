@@ -18,6 +18,10 @@ class block_updatedresources extends block_list {
     public function instance_allow_multiple() {
   		return false;
 	}
+
+	public function applicable_formats() {
+    	return array('my-index' => true);
+    }
     
     public function get_content() {
         global $CFG, $USER, $DB, $OUTPUT;
@@ -40,12 +44,12 @@ class block_updatedresources extends block_list {
                 $cids = join(',',$cs);
 
             	$lookback = time() - 7*24*60*60;
-            	$listsize = $this->config->listsize;
-            	if (empty($listsize)){
+
+            	if (isset($this->config->listsize)) {
+            		$listsize = $this->config->listsize;
+            	} else {
             		$listsize = '10';
-            		$this->config->listsize = '10';
             	}
-            	
 
             	$sql = 'Select cm.id, inst.moduleid, inst.name, cm.course, cm.visible, inst.timemodified, m.name as module
 					From mdl_course_modules cm
@@ -71,8 +75,7 @@ class block_updatedresources extends block_list {
 					from mdl_scorm s
 					union all
 					SELECT \'20\' AS moduleid, id, course, name, timemodified
-					from mdl_url u
-					) inst
+					from mdl_url u) inst
 					on inst.moduleid = cm.module
 					and inst.id = cm.instance
 					where cm.visible = \'1\'
@@ -94,8 +97,6 @@ class block_updatedresources extends block_list {
 		return $this->content;
 
 	    }
-
-
   	
   	}
 }

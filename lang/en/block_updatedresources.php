@@ -13,3 +13,4 @@ $string['lastsevendays'] = 'Last 7 days ';
 $string['resource'] = 'Resource';
 $string['course'] = 'Course';
 $string['lastupdate'] = 'Last update';
+$string['searchmessage'] = 'This search criteria matches no content';

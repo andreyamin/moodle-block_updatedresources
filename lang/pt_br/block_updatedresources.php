@@ -13,3 +13,4 @@ $string['lastsevendays'] = 'Últimos 7 dias ';
 $string['resource'] = 'Recurso';
 $string['course'] = 'Curso';
 $string['lastupdate'] = 'Última atualização';
+$string['searchmessage'] = 'Não foi possível encontrar nenhum item com base nos critérios de busca acima.';

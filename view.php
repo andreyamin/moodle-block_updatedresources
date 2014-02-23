@@ -13,7 +13,6 @@ $PAGE->set_heading(get_string('advancedsearch', 'block_updatedresources'));
 
 $lookback = optional_param('lookback','0', PARAM_INT);
 $cid      = optional_param('cid','0', PARAM_INT);
-$page     = optional_param('page', 0, PARAM_INT);
 $perpage  = optional_param('perpage', 10, PARAM_INT);
 
 if (empty($lookback)) {
@@ -28,7 +27,7 @@ if (empty($cid)) {
 echo $OUTPUT->header();
 //$searchform->display();
 
-echo "<form class=\"logselectform\" action=\"$CFG->wwwroot/blocks/updatedresources/view.php\" method=\"get\">\n";
+echo "<form action=\"$CFG->wwwroot/blocks/updatedresources/view.php\" method=\"get\">\n";
 echo "<div>\n";
 
 $strftimedate = get_string("strftimedate");
@@ -140,6 +139,9 @@ if (isloggedin() and !isguestuser()) {
         		$table->data[] = array(html_writer::link($resourceurl,$resourcename), html_writer::link($resourcecourseurl,$resourcecourse), $date);
         	}
         	echo html_writer::table($table);
+        } else {
+        	echo html_writer::tag('p',get_string('searchmessage', 'block_updatedresources'));
+
         }
     }
 }
