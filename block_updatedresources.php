@@ -43,7 +43,7 @@ class block_updatedresources extends block_list {
                 $cids = '';
                 $cids = join(',',$cs);
 
-            	$lookback = time() - 7*24*60*60;
+            	$lookback = $USER->lastlogin;
 
             	if (isset($this->config->listsize)) {
             		$listsize = $this->config->listsize;
@@ -51,38 +51,53 @@ class block_updatedresources extends block_list {
             		$listsize = '10';
             	}
 
+
+
             	$sql = 'Select cm.id, inst.moduleid, inst.name, cm.course, cm.visible, inst.timemodified, m.name as module
 					From mdl_course_modules cm
-					join mdl_modules m
-					on  m.id = cm.module
-					join (
-					SELECT \'3\' AS moduleid, id, course, name, timemodified
-					from mdl_book b
-					UNION all
-					SELECT \'8\' AS moduleid, id, course, name,  timemodified
-					from mdl_folder f
-					union all
-					SELECT \'11\' AS moduleid, id, course, name, timemodified
-					from mdl_imscp i 
-					Union all
-					SELECT \'15\' AS moduleid, id, course, name,  timemodified
-					from mdl_page p
-					union all
-					SELECT \'17\' AS moduleid, id, course, name, timemodified
-					from mdl_resource r
-					union all
-					SELECT \'18\' AS moduleid, id, course, name, timemodified
-					from mdl_scorm s
-					union all
-					SELECT \'20\' AS moduleid, id, course, name, timemodified
-					from mdl_url u) inst
-					on inst.moduleid = cm.module
-					and inst.id = cm.instance
-					where cm.visible = \'1\'
-					and cm.course in (' . $cids . ')
-					and inst.timemodified > ' . $lookback . '
-					order by inst.timemodified desc
-					limit ' . $listsize;
+						join mdl_modules m
+							on  m.id = cm.module
+						join (
+							SELECT \'1\' AS moduleid, id, course, name, timemodified
+							from mdl_assign a
+							UNION all
+							SELECT \'3\' AS moduleid, id, course, name, timemodified
+							from mdl_book b
+							UNION all
+							SELECT \'8\' AS moduleid, id, course, name,  timemodified
+							from mdl_folder f
+							UNION all
+							SELECT \'9\' AS moduleid, id, course, name, timemodified
+							from mdl_forum fo
+							union all
+							SELECT \'11\' AS moduleid, id, course, name, timemodified
+							from mdl_imscp i 
+							Union all
+							SELECT \'15\' AS moduleid, id, course, name,  timemodified
+							from mdl_page p
+							union all
+							SELECT \'16\' AS moduleid, id, course, name, timemodified
+							from mdl_quiz q
+							UNION all
+							SELECT \'17\' AS moduleid, id, course, name, timemodified
+							from mdl_resource r
+							union all
+							SELECT \'18\' AS moduleid, id, course, name, timemodified
+							from mdl_scorm s
+							union all
+							SELECT \'20\' AS moduleid, id, course, name, timemodified
+							from mdl_url u
+							UNION all
+							SELECT \'21\' AS moduleid, id, course, name, timemodified
+							from mdl_wiki w
+						) inst
+							on inst.moduleid = cm.module
+							and inst.id = cm.instance
+						where cm.visible = \'1\'
+							and cm.course in (' . $cids . ')
+							and inst.timemodified > ' . $lookback . '
+						order by inst.timemodified desc
+						limit ' . $listsize;
 
 
                 $resources = $DB->get_records_sql($sql);

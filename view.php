@@ -13,7 +13,6 @@ $PAGE->set_heading(get_string('advancedsearch', 'block_updatedresources'));
 
 $lookback = optional_param('lookback','0', PARAM_INT);
 $cid      = optional_param('cid','0', PARAM_INT);
-$perpage  = optional_param('perpage', 10, PARAM_INT);
 
 if (empty($lookback)) {
 	$lookback = time() - 7*24*60*60;
@@ -27,8 +26,7 @@ if (empty($cid)) {
 echo $OUTPUT->header();
 //$searchform->display();
 
-echo "<form action=\"$CFG->wwwroot/blocks/updatedresources/view.php\" method=\"get\">\n";
-echo "<div>\n";
+
 
 $strftimedate = get_string("strftimedate");
 $strftimedaydate = get_string("strftimedaydate");
@@ -55,9 +53,10 @@ foreach ($courses as $course) {
 	$courselist[$course->id] = $course->fullname;
 }
 
+echo "<form action=\"$CFG->wwwroot/blocks/updatedresources/view.php\" method=\"get\">\n";
+echo "<div class=\"updated-resources-form\">\n";
 echo html_writer::label(get_string('courses', 'block_updatedresources'), 'courses');
 echo html_writer::select($courselist, "cid", $cid, get_string('allcourses', 'block_updatedresources'));
-
 echo html_writer::label(get_string('showupdatessince', 'block_updatedresources'), 'lookback');
 echo html_writer::select($dates, "lookback", "$lookback", get_string('lastsevendays', 'block_updatedresources'));
 
@@ -87,26 +86,38 @@ if (isloggedin() and !isguestuser()) {
 			join mdl_course c
 			on cm.course = c.id
 			join (
-			SELECT \'3\' AS moduleid, id, course, name, timemodified
-			from mdl_book b
-			UNION all
-			SELECT \'8\' AS moduleid, id, course, name,  timemodified
-			from mdl_folder f
-			union all
-			SELECT \'11\' AS moduleid, id, course, name, timemodified
-			from mdl_imscp i 
-			Union all
-			SELECT \'15\' AS moduleid, id, course, name,  timemodified
-			from mdl_page p
-			union all
-			SELECT \'17\' AS moduleid, id, course, name, timemodified
-			from mdl_resource r
-			union all
-			SELECT \'18\' AS moduleid, id, course, name, timemodified
-			from mdl_scorm s
-			union all
-			SELECT \'20\' AS moduleid, id, course, name, timemodified
-			from mdl_url u
+				SELECT \'1\' AS moduleid, id, course, name, timemodified
+				from mdl_assign a
+				UNION all
+				SELECT \'3\' AS moduleid, id, course, name, timemodified
+				from mdl_book b
+				UNION all
+				SELECT \'8\' AS moduleid, id, course, name,  timemodified
+				from mdl_folder f
+				UNION all
+				SELECT \'9\' AS moduleid, id, course, name, timemodified
+				from mdl_forum fo
+				union all
+				SELECT \'11\' AS moduleid, id, course, name, timemodified
+				from mdl_imscp i 
+				Union all
+				SELECT \'15\' AS moduleid, id, course, name,  timemodified
+				from mdl_page p
+				union all
+				SELECT \'16\' AS moduleid, id, course, name, timemodified
+				from mdl_quiz q
+				UNION all
+				SELECT \'17\' AS moduleid, id, course, name, timemodified
+				from mdl_resource r
+				union all
+				SELECT \'18\' AS moduleid, id, course, name, timemodified
+				from mdl_scorm s
+				union all
+				SELECT \'20\' AS moduleid, id, course, name, timemodified
+				from mdl_url u
+				UNION all
+				SELECT \'21\' AS moduleid, id, course, name, timemodified
+				from mdl_wiki w
 			) inst
 			on inst.moduleid = cm.module
 			and inst.id = cm.instance
