@@ -16,7 +16,7 @@ class block_updatedresources extends block_list {
 	}
 
     public function instance_allow_multiple() {
-  		return false;
+  		return true;
 	}
 
 	public function applicable_formats() {
