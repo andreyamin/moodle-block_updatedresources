@@ -16,11 +16,11 @@ class block_updatedresources extends block_list {
 	}
 
     public function instance_allow_multiple() {
-  		return true;
+  		return false;
 	}
 
 	public function applicable_formats() {
-    	return array('my-index' => true);
+    	return array('all' => true);
     }
     
     public function get_content() {
