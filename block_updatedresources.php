@@ -43,7 +43,6 @@ class block_updatedresources extends block_list {
                 $cids = '';
                 $cids = join(',',$cs);
 
-            	$lookback = $USER->lastlogin;
 
             	if (isset($this->config->listsize)) {
             		$listsize = $this->config->listsize;
@@ -95,7 +94,6 @@ class block_updatedresources extends block_list {
 							and inst.id = cm.instance
 						where cm.visible = \'1\'
 							and cm.course in (' . $cids . ')
-							and inst.timemodified > ' . $lookback . '
 						order by inst.timemodified desc
 						limit ' . $listsize;
 
